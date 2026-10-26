@@ -64,12 +64,12 @@ Hasil notebook terbaru mencatat CatBoost hasil tuning dengan R² test **0,8628**
 
 Lengkapi tabel berikut dengan data kelompok yang sebenarnya.
 
-| No. | Nama                       | NIM   | Kontribusi                              |
-| --: | -------------------------- | ----- | --------------------------------------- |
-|   1 | [Nama anggota 1]           | [NIM] | [Kontribusi yang benar-benar dilakukan] |
-|   2 | [Nama anggota 2]           | [NIM] | [Kontribusi yang benar-benar dilakukan] |
-|   3 | [Nama anggota 3]           | [NIM] | [Kontribusi yang benar-benar dilakukan] |
-|   4 | [Nama anggota 4, jika ada] | [NIM] | [Kontribusi yang benar-benar dilakukan] |
+| No. | Nama                           | NIM       | Kontribusi                              |
+| --: | ------------------------------ | --------- | --------------------------------------- |
+|   1 | Tanti Eka Lestari              | 123240059 | EDA                                     |
+|   2 | Vincentius Gavrila Subagyo     | 123240146 | Modeling                                |
+|   3 | Nicholaus Herjuna Dianaji      | 123240152 | Data Cleaning                           |
+|   4 | Muhammad Jiddan Najwan Junaidi | 123240178 | Preprocessing                           |
 
 ## Cara Menjalankan
 
@@ -108,9 +108,3 @@ Pastikan `Project_Supervised.ipynb` dan `laptops.csv` berada di folder yang sama
 5. Buka `Project_Supervised.ipynb` dan jalankan sel secara berurutan dari atas. Notebook membaca dataset menggunakan nama file `laptops.csv`.
 
 Karena `laptops.csv` disertakan di repository, proses menjalankan notebook tidak memerlukan Kaggle API. Jika dataset diperbarui, pastikan sumber, versi/tanggal pengambilan, dan lisensinya tetap dicatat.
-
-## Catatan
-
-- Lengkapi nama, NIM, dan kontribusi setiap anggota sebelum pengumpulan.
-- Verifikasi dan cantumkan lisensi dataset dari halaman sumber.
-- Metrik RMSE notebook dihitung pada target `log1p(Final Price)`; MAE dilaporkan pada skala harga.
