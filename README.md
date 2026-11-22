@@ -10,7 +10,7 @@ Tujuan proyek:
 
 - Menilai seberapa baik fitur laptop dapat memperkirakan harga.
 - Membandingkan beberapa model regresi.
-- Mengukur selisih prediksi dengan R², RMSE, dan MAE.
+- Mengukur selisih prediksi dengan R², RMSE, MAE, dan MAPE.
 
 ## Dataset dan Sumber
 
@@ -51,14 +51,35 @@ Kolom utama dataset:
 Notebook menjalankan tahapan berikut:
 
 1. Memeriksa struktur, tipe data, nilai kosong, statistik deskriptif, dan distribusi data.
-2. Membersihkan dan memproses fitur, termasuk membuat kategori CPU dan GPU serta fitur rasio RAM terhadap storage.
-3. Membagi data menjadi data latih dan data uji dengan `test_size=0.2` dan `random_state=42`.
-4. Mentransformasikan target harga menggunakan `log1p`.
-5. Memilih 15 fitur dengan `SelectKBest` dan `f_regression`.
-6. Membandingkan Linear Regression, Ridge, Decision Tree, XGBoost, LightGBM, dan CatBoost; beberapa model juga dituning menggunakan `GridSearchCV`.
-7. Mengevaluasi model menggunakan R² dan RMSE pada target log, serta MAE setelah prediksi dikembalikan ke skala harga.
+2. Membersihkan data: merapikan nama brand, memperbaiki label CPU berdasarkan judul produk, merapikan GPU, menangani `Storage` bernilai 0 sebagai nilai kosong, dan menghapus baris duplikat (spesifikasi dan harga identik dengan SKU berbeda) agar tidak bocor antara data latih dan data uji.
+3. Feature engineering: `CPU_Class`, `GPU_Class`, `RAM_Storage_Ratio`, `cpu_year`, `cpu_segment`, `gpu_score`, `is_oled`, dan `high_refresh`.
+4. Membagi data menjadi data latih (1.678 baris) dan data uji (420 baris) dengan `test_size=0.2` dan `random_state=42`.
+5. Mentransformasikan target harga menggunakan `log1p`. Outlier tidak di-clip karena merupakan laptop kelas atas yang nyata.
+6. Preprocessing dalam satu `ColumnTransformer` yang hanya di-fit pada data latih (tanpa data leakage):
+   - Imputer median untuk fitur numerik
+   - Label/ordinal encoding untuk `Status` dan `CPU_Class`
+   - One-hot encoding untuk `Storage type`, `GPU_Class`, `cpu_segment`
+   - One-hot encoding dengan penggabungan kategori langka (kurang dari 5 kemunculan) untuk `Brand`, `Model`, `CPU`, `GPU`. Opsi ini dipilih lewat 5-fold CV dibanding target encoding (CV RMSE 0,2047 vs 0,2232).
+7. Feature selection dengan `SelectKBest` dan `f_regression`. Nilai k dipilih lewat CV (15, 30, 50, semua); hasilnya semua 160 fitur dipakai.
+8. Membandingkan Linear Regression, Ridge, Decision Tree, XGBoost, LightGBM, dan CatBoost dengan 5-fold CV; Ridge, XGBoost, LightGBM, dan CatBoost juga dituning menggunakan `GridSearchCV`.
+9. Mengevaluasi model terpilih satu kali pada data uji menggunakan R² dan RMSE pada target log, serta MAE, RMSE, dan MAPE setelah prediksi dikembalikan ke skala harga.
 
-Hasil notebook terbaru mencatat CatBoost hasil tuning dengan R² test **0,8628**, RMSE test **0,2445** pada skala log, dan MAE sekitar **249 euro**. Angka ini merupakan hasil eksperimen notebook saat ini; gunakan dengan hati-hati karena data uji dipakai berulang kali selama perbandingan model.
+## Hasil
+
+Model terbaik adalah **CatBoost hasil tuning** (`depth=6`, `iterations=800`, `learning_rate=0.05`, `l2_leaf_reg=3`). XGBoost hasil tuning hampir sama (CV RMSE 0,2046 vs 0,2045).
+
+| Metrik                        | Nilai      |
+| ----------------------------- | ---------- |
+| CV R² (skala log)             | 0,9016     |
+| CV RMSE (skala log)           | 0,2045     |
+| R² data uji (skala log)       | **0,9120** |
+| RMSE data uji (skala log)     | 0,1885     |
+| MAE data uji (skala harga)    | ±172 euro  |
+| RMSE data uji (skala harga)   | ±269 euro  |
+| MAPE data uji (skala harga)   | 14,51%     |
+| R² data uji (skala harga)     | 0,9021     |
+
+Seluruh pemilihan (encoding, jumlah fitur, model, dan hyperparameter) dilakukan dengan cross validation pada data latih; data uji hanya dipakai satu kali pada evaluasi akhir.
 
 ## Informasi Anggota dan Kontribusi
 
